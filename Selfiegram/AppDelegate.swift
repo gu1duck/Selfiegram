@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Parse
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        Parse.setApplicationId("PZzGTD8UFGZlKQLmHyeMxxGI2FYvFp7XlQAnNisZ", clientKey: "8RRx1K4yII8EEf01u1008PqwKcRZLttM7CPFNxP9")
+
+        let user = PFUser()
+        user.username = "Jeremy"
+        user.password = "Petter"
+
+        user.signUpInBackgroundWithBlock { (success, error) -> Void in
+            if success == true {
+                print("User \"\(user.username)\" added")
+            } else {
+                PFUser.logInWithUsernameInBackground(user.username!, password: user.password!, block: { (user, error) -> Void in
+                    if let user = user {
+                        print("User \"\(user.username)\" logged in")
+                    }
+                })
+            }
+        }
+
+
         return true
     }
 

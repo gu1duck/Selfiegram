@@ -9,12 +9,12 @@
 import UIKit
 
 class Post {
-    let image:UIImage
+    let imageURL:NSURL
     let user:User
     let comment:String
 
-    init(image:UIImage, user:User, comment:String) {
-        self.image = image
+    init(imageURL:NSURL, user:User, comment:String) {
+        self.imageURL = imageURL
         self.user = user
         self.comment = comment
     }

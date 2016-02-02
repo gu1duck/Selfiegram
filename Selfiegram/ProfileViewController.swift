@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Parse
 
 class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -15,8 +16,18 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
 
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
 
-        userNameLabel.text = "yourName"
+    override func viewWillAppear(animated: Bool) {
+        self.userNameLabel.text = PFUser.currentUser()?.username
+        if let imageFile = PFUser.currentUser()?["avatarImage"] as? PFFile {
+            imageFile.getDataInBackgroundWithBlock({ (data, error) -> Void in
+
+                if let imageData = data {
+                    self.profileImageView.image = UIImage(data: imageData)
+                }
+            })
+        }
     }
 
     @IBAction func cameraButtonPressed(sender: AnyObject) {
@@ -35,7 +46,18 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
 
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            profileImageView.image = image
+
+            if let imageData = UIImageJPEGRepresentation(image, 0.9),
+                let imageFile = PFFile(data: imageData),
+                let user = PFUser.currentUser() {
+                    user["avatarImage"] = imageFile
+                    user.saveInBackgroundWithBlock({ (success, error) -> Void in
+                        if success == true {
+                            self.profileImageView.image = UIImage(data: imageData)
+
+                        }
+                    })
+            }
         }
         dismissViewControllerAnimated(true, completion: nil)
 
